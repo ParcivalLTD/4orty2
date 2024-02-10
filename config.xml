@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="at.parcivalltd.fortytwo" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>4orty2</name>
+    <description>A mobile game</description>
+    <author email="juliangabriel570@gmail.com" href="https://wavebeef.duckdns.org">
+        Julian Gabriel
+    </author>
+    <content src="index.html" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <icon src="res/icon-512.png" />
+</widget>
