@@ -43,6 +43,22 @@ app.post("/savehighscores", async (req, res) => {
   }
 });
 
+app.get("/topusers", async (req, res) => {
+  try {
+    await client.connect();
+    const database = client.db("game");
+    const collection = database.collection("highscores");
+
+    const topUsers = await collection.find().sort({ highscore: -1 }).limit(10).toArray();
+    res.status(200).json(topUsers);
+  } catch (error) {
+    console.error("Error fetching top users:", error);
+    res.status(500).json({ error: "Error fetching top users" });
+  } finally {
+    await client.close();
+  }
+});
+
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
 });

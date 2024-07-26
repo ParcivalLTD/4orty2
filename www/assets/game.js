@@ -1,3 +1,5 @@
+let backendUrl = "https://fourorty2.onrender.com";
+
 document.addEventListener("DOMContentLoaded", () => {
   const gridDisplay = document.querySelector(".grid");
   const scoreDisplay = document.querySelector("#score");
@@ -222,7 +224,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function saveHighscore(username, highscore) {
-    const url = "http://localhost:3000/savehighscores";
+    const url = backendUrl + "/savehighscores";
     const data = { username: username, highscore: highscore };
 
     const currentHighscore = localStorage.getItem("highscore");
