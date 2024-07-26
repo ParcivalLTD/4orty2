@@ -1,50 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>4orty2</title>
     <script src="https://kit.fontawesome.com/f9c23346f5.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="assets/style.css">
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <div class="user-info">
-                <span class="username">Username</span>
-                <span class="highscore">Highscore</span>
-            </div>
-            <div class="status-dot online"></div>
+    <link rel="stylesheet" href="assets/style.css" />
+  </head>
+  <body>
+    <div class="content">
+      <div class="header">
+        <div class="user-info">
+          <span class="username">Username</span>
+          <span class="highscore">Highscore</span>
         </div>
-        
-        <div class="footer">
-            <span class="copyright">© Julian Gabriel</span>
-        </div>
-        <div class="main">
-            
-        </div>
-        
-        <div class="side-l"></div>
-        <div class="side-r"></div>
+        <div class="status-dot online"></div>
+      </div>
 
-        <div class="menu">
-            <h1>4orty2</h1>
-            <ul class="button-list">
-                <li><button onclick="play()">play</button></li>
-                <li><button>settings</button></li>
-                <li><button>scoreboard</button></li>
-                <li><button>exit</button></li>
-            </ul>
-        </div>
+      <div class="footer">
+        <span class="copyright">© Julian Gabriel</span>
+      </div>
+      <div class="main"></div>
 
-        <div class="game">
-            <button onclick="back()" id="back"><i class="fa-solid fa-arrow-left"></i></button>
-            <div id="score"></div>
-    <br><br>
-    <div id="board"></div>
+      <div class="side-l"></div>
+      <div class="side-r"></div>
+
+      <div id="username-modal" class="modal">
+        <div class="modal-content">
+          <h2>Enter your username</h2>
+          <input type="text" id="username-input" placeholder="Username" />
+          <button onclick="saveUsername()">Save</button>
         </div>
+      </div>
+
+      <div class="menu">
+        <h1>4orty2</h1>
+        <ul class="button-list">
+          <li><button onclick="play()">play</button></li>
+          <li><button>settings</button></li>
+          <li><button>scoreboard</button></li>
+          <li><button>exit</button></li>
+        </ul>
+      </div>
     </div>
-    <script src="assets/script.js"></script>
     <script src="assets/game.js"></script>
-</body>
+
+    <script src="assets/script.js"></script>
+  </body>
 </html>

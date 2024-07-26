@@ -1,232 +1,321 @@
- let board = [];
- const size = 6;
- let score = 0;
+document.addEventListener("DOMContentLoaded", () => {
+  const gridDisplay = document.querySelector(".grid");
+  const scoreDisplay = document.querySelector("#score");
+  const resultDisplay = document.querySelector("#result");
+  const width = 4;
+  let squares = [];
+  let score = 0;
 
- function initializeBoard() {
-     for (let i = 0; i < size; i++) {
-         board[i] = [];
-         for (let j = 0; j < size; j++) {
-             board[i][j] = 0;
-         }
-     }
- }
+  // create the playing board
+  function createBoard() {
+    for (let i = 0; i < width * width; i++) {
+      const square = document.createElement("div");
+      square.innerHTML = 0;
+      gridDisplay.appendChild(square);
+      squares.push(square);
+    }
+    generate();
+    generate();
+  }
+  createBoard();
 
- function addRandomTile() {
-    const emptySpots = [];
-    for (let i = 0; i < size; i++) {
-        for (let j = 0; j < size; j++) {
-            if (board[i][j] === 0) {
-                emptySpots.push({ x: i, y: j });
-            }
+  //generate a new number
+  function generate() {
+    const randomNumber = Math.floor(Math.random() * squares.length);
+    if (squares[randomNumber].innerHTML == 0) {
+      squares[randomNumber].innerHTML = 2;
+      checkForGameOver();
+    } else generate();
+  }
+
+  function moveRight() {
+    for (let i = 0; i < 16; i++) {
+      if (i % 4 === 0) {
+        let totalOne = squares[i].innerHTML;
+        let totalTwo = squares[i + 1].innerHTML;
+        let totalThree = squares[i + 2].innerHTML;
+        let totalFour = squares[i + 3].innerHTML;
+        let row = [parseInt(totalOne), parseInt(totalTwo), parseInt(totalThree), parseInt(totalFour)];
+
+        let filteredRow = row.filter((num) => num);
+        let missing = 4 - filteredRow.length;
+        let zeros = Array(missing).fill(0);
+        let newRow = zeros.concat(filteredRow);
+
+        squares[i].innerHTML = newRow[0];
+        squares[i + 1].innerHTML = newRow[1];
+        squares[i + 2].innerHTML = newRow[2];
+        squares[i + 3].innerHTML = newRow[3];
+      }
+    }
+  }
+
+  function moveLeft() {
+    for (let i = 0; i < 16; i++) {
+      if (i % 4 === 0) {
+        let totalOne = squares[i].innerHTML;
+        let totalTwo = squares[i + 1].innerHTML;
+        let totalThree = squares[i + 2].innerHTML;
+        let totalFour = squares[i + 3].innerHTML;
+        let row = [parseInt(totalOne), parseInt(totalTwo), parseInt(totalThree), parseInt(totalFour)];
+
+        let filteredRow = row.filter((num) => num);
+        let missing = 4 - filteredRow.length;
+        let zeros = Array(missing).fill(0);
+        let newRow = filteredRow.concat(zeros);
+
+        squares[i].innerHTML = newRow[0];
+        squares[i + 1].innerHTML = newRow[1];
+        squares[i + 2].innerHTML = newRow[2];
+        squares[i + 3].innerHTML = newRow[3];
+      }
+    }
+  }
+
+  function moveUp() {
+    for (let i = 0; i < 4; i++) {
+      let totalOne = squares[i].innerHTML;
+      let totalTwo = squares[i + width].innerHTML;
+      let totalThree = squares[i + width * 2].innerHTML;
+      let totalFour = squares[i + width * 3].innerHTML;
+      let column = [parseInt(totalOne), parseInt(totalTwo), parseInt(totalThree), parseInt(totalFour)];
+
+      let filteredColumn = column.filter((num) => num);
+      let missing = 4 - filteredColumn.length;
+      let zeros = Array(missing).fill(0);
+      let newColumn = filteredColumn.concat(zeros);
+
+      squares[i].innerHTML = newColumn[0];
+      squares[i + width].innerHTML = newColumn[1];
+      squares[i + width * 2].innerHTML = newColumn[2];
+      squares[i + width * 3].innerHTML = newColumn[3];
+    }
+  }
+
+  function moveDown() {
+    for (let i = 0; i < 4; i++) {
+      let totalOne = squares[i].innerHTML;
+      let totalTwo = squares[i + width].innerHTML;
+      let totalThree = squares[i + width * 2].innerHTML;
+      let totalFour = squares[i + width * 3].innerHTML;
+      let column = [parseInt(totalOne), parseInt(totalTwo), parseInt(totalThree), parseInt(totalFour)];
+
+      let filteredColumn = column.filter((num) => num);
+      let missing = 4 - filteredColumn.length;
+      let zeros = Array(missing).fill(0);
+      let newColumn = zeros.concat(filteredColumn);
+
+      squares[i].innerHTML = newColumn[0];
+      squares[i + width].innerHTML = newColumn[1];
+      squares[i + width * 2].innerHTML = newColumn[2];
+      squares[i + width * 3].innerHTML = newColumn[3];
+    }
+  }
+
+  function combineRow() {
+    for (let i = 0; i < 15; i++) {
+      if (squares[i].innerHTML === squares[i + 1].innerHTML) {
+        let combinedTotal = parseInt(squares[i].innerHTML) + parseInt(squares[i + 1].innerHTML);
+        squares[i].innerHTML = combinedTotal;
+        squares[i + 1].innerHTML = 0;
+        score += combinedTotal;
+        scoreDisplay.innerHTML = score;
+      }
+    }
+    checkForWin();
+  }
+
+  function combineColumn() {
+    for (let i = 0; i < 12; i++) {
+      if (squares[i].innerHTML === squares[i + width].innerHTML) {
+        let combinedTotal = parseInt(squares[i].innerHTML) + parseInt(squares[i + width].innerHTML);
+        squares[i].innerHTML = combinedTotal;
+        squares[i + width].innerHTML = 0;
+        score += combinedTotal;
+        scoreDisplay.innerHTML = score;
+      }
+    }
+    checkForWin();
+  }
+
+  ///assign functions to keys
+  function control(e) {
+    if (e.key === "ArrowLeft") {
+      keyLeft();
+    } else if (e.key === "ArrowRight") {
+      keyRight();
+    } else if (e.key === "ArrowUp") {
+      keyUp();
+    } else if (e.key === "ArrowDown") {
+      keyDown();
+    }
+  }
+  document.addEventListener("keydown", control);
+
+  function keyLeft() {
+    moveLeft();
+    combineRow();
+    moveLeft();
+    generate();
+  }
+
+  function keyRight() {
+    moveRight();
+    combineRow();
+    moveRight();
+    generate();
+  }
+
+  function keyUp() {
+    moveUp();
+    combineColumn();
+    moveUp();
+    generate();
+  }
+
+  function keyDown() {
+    moveDown();
+    combineColumn();
+    moveDown();
+    generate();
+  }
+
+  //check for the number 2048 in the squares to win
+  function checkForWin() {
+    for (let i = 0; i < squares.length; i++) {
+      if (squares[i].innerHTML == 2048) {
+        resultDisplay.innerHTML = "You WIN!";
+        document.removeEventListener("keydown", control);
+        setTimeout(clear, 3000);
+      }
+    }
+  }
+
+  function checkForGameOver() {
+    let zeros = 0;
+    for (let i = 0; i < squares.length; i++) {
+      if (squares[i].innerHTML == 0) {
+        zeros++;
+      }
+    }
+
+    let noValidMoves = true;
+    for (let i = 0; i < 16; i++) {
+      if (i % 4 < 3 && squares[i].innerHTML == squares[i + 1].innerHTML) {
+        noValidMoves = false;
+        break;
+      }
+      if (i < 12 && squares[i].innerHTML == squares[i + 4].innerHTML) {
+        noValidMoves = false;
+        break;
+      }
+    }
+
+    if (zeros === 0 && noValidMoves) {
+      resultDisplay.innerHTML = "You LOSE!";
+      document.removeEventListener("keydown", control);
+      setTimeout(clear, 3000);
+
+      let username = localStorage.getItem("username");
+      saveHighscore(username, score);
+    }
+  }
+
+  async function saveHighscore(username, highscore) {
+    const url = "http://localhost:3000/savehighscores";
+    const data = { username: username, highscore: highscore };
+
+    const currentHighscore = localStorage.getItem("highscore");
+
+    if (!currentHighscore || highscore > currentHighscore) {
+      localStorage.setItem("highscore", highscore);
+
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
+
+        const resultText = await response.text();
+        console.log("Server response:", resultText);
+
+        const result = JSON.parse(resultText);
+        console.log("Highscore saved:", result);
+      } catch (error) {
+        console.error("Error saving highscore:", error);
+      }
     }
-    if (emptySpots.length > 0) {
-        const spot = emptySpots[Math.floor(Math.random() * emptySpots.length)];
-        board[spot.x][spot.y] = 1; // Always add a 1
+  }
+
+  function clear() {
+    clearInterval(myTimer);
+  }
+
+  //add colours
+  function addColours() {
+    for (let i = 0; i < squares.length; i++) {
+      if (squares[i].innerHTML == 0) squares[i].style.backgroundColor = "#afa192";
+      else if (squares[i].innerHTML == 2) squares[i].style.backgroundColor = "#eee4da";
+      else if (squares[i].innerHTML == 4) squares[i].style.backgroundColor = "#ede0c8";
+      else if (squares[i].innerHTML == 8) squares[i].style.backgroundColor = "#f2b179";
+      else if (squares[i].innerHTML == 16) squares[i].style.backgroundColor = "#ffcea4";
+      else if (squares[i].innerHTML == 32) squares[i].style.backgroundColor = "#e8c064";
+      else if (squares[i].innerHTML == 64) squares[i].style.backgroundColor = "#ffab6e";
+      else if (squares[i].innerHTML == 128) squares[i].style.backgroundColor = "#fd9982";
+      else if (squares[i].innerHTML == 256) squares[i].style.backgroundColor = "#ead79c";
+      else if (squares[i].innerHTML == 512) squares[i].style.backgroundColor = "#76daff";
+      else if (squares[i].innerHTML == 1024) squares[i].style.backgroundColor = "#beeaa5";
+      else if (squares[i].innerHTML == 2048) squares[i].style.backgroundColor = "#d7d4f0";
     }
+  }
+  addColours();
+
+  let myTimer = setInterval(addColours, 50);
+});
+
+let touchStartX = 0;
+let touchStartY = 0;
+let touchEndX = 0;
+let touchEndY = 0;
+
+document.addEventListener("touchstart", handleTouchStart, false);
+document.addEventListener("touchmove", handleTouchMove, false);
+document.addEventListener("touchend", handleTouchEnd, false);
+
+function handleTouchStart(event) {
+  touchStartX = event.changedTouches[0].screenX;
+  touchStartY = event.changedTouches[0].screenY;
 }
 
- function move(direction) {
-     const copyBoard = JSON.parse(JSON.stringify(board));
-     switch (direction) {
-         case 'left':
-             for (let i = 0; i < size; i++) {
-                 let stack = [];
-                 for (let j = 0; j < size; j++) {
-                     if (board[i][j] !== 0) {
-                         stack.push(board[i][j]);
-                     }
-                 }
-                 stack = merge(stack);
-                 for (let j = 0; j < size; j++) {
-                     if (stack.length) {
-                         board[i][j] = stack.shift();
-                     } else {
-                         board[i][j] = 0;
-                     }
-                 }
-             }
-             break;
-         case 'right':
-    for (let i = 0; i < size; i++) {
-        let stack = [];
-        for (let j = size - 1; j >= 0; j--) {
-            if (board[i][j] !== 0) {
-                stack.push(board[i][j]);
-            }
-        }
-        stack = merge(stack);
-        for (let j = size - 1; j >= 0; j--) {
-            if (stack.length) {
-                board[i][j] = stack.pop();
-            } else {
-                board[i][j] = 0;
-            }
-        }
-    }
-    break;
-         case 'up':
-             for (let j = 0; j < size; j++) {
-                 let stack = [];
-                 for (let i = 0; i < size; i++) {
-                     if (board[i][j] !== 0) {
-                         stack.push(board[i][j]);
-                     }
-                 }
-                 stack = merge(stack);
-                 for (let i = 0; i < size; i++) {
-                     if (stack.length) {
-                         board[i][j] = stack.shift();
-                     } else {
-                         board[i][j] = 0;
-                     }
-                 }
-             }
-             break;
-         case 'down':
-             for (let j = 0; j < size; j++) {
-                 let stack = [];
-                 for (let i = size - 1; i >= 0; i--) {
-                     if (board[i][j] !== 0) {
-                         stack.push(board[i][j]);
-                     }
-                 }
-                 stack = merge(stack);
-                 for (let i = size - 1; i >= 0; i--) {
-                     if (stack.length) {
-                         board[i][j] = stack.pop();
-                     } else {
-                         board[i][j] = 0;
-                     }
-                 }
-             }
-             break;
-     }
-     if (!arraysEqual(board, copyBoard)) {
-         addRandomTile();
-         updateBoard();
-     }
- }
-
- function merge(stack) {
-    for (let i = 0; i < stack.length - 1; i++) {
-        if (stack[i] === stack[i + 1]) {
-            stack[i] += 1; // Increase by 1 instead of adding
-            score += stack[i];
-            stack.splice(i + 1, 1);
-        }
-    }
-    return stack;
-}
-function updateScoreDisplay() {
-    let scoreElement = document.getElementById('score');
-    if (scoreElement) {
-        scoreElement.textContent = score;
-    }
+function handleTouchMove(event) {
+  touchEndX = event.changedTouches[0].screenX;
+  touchEndY = event.changedTouches[0].screenY;
 }
 
- function arraysEqual(arr1, arr2) {
-     return JSON.stringify(arr1) === JSON.stringify(arr2);
- }
+function handleTouchEnd() {
+  const deltaX = touchEndX - touchStartX;
+  const deltaY = touchEndY - touchStartY;
 
- function updateBoard() {
-    updateScoreDisplay();
-     const boardContainer = document.getElementById('board');
-     boardContainer.innerHTML = '';
-     for (let i = 0; i < size; i++) {
-         for (let j = 0; j < size; j++) {
-             const tileValue = board[i][j];
-             const tileDiv = document.createElement('div');
-             updateTile(tileDiv, tileValue);
-
-             tileDiv.className = 'tile';
-             tileDiv.textContent = tileValue === 0 ? '' : tileValue;
-             boardContainer.appendChild(tileDiv);
-         }
-         boardContainer.appendChild(document.createElement('br'));
-     }
- }
-
- let xDown = null;
- let yDown = null;
-
- function handleTouchStart(evt) {
-     xDown = evt.touches[0].clientX;
-     yDown = evt.touches[0].clientY;
- };
-
- function handleTouchMove(evt) {
-     if (!xDown || !yDown) {
-         return;
-     }
-
-     let xUp = evt.touches[0].clientX;
-     let yUp = evt.touches[0].clientY;
-
-     let xDiff = xDown - xUp;
-     let yDiff = yDown - yUp;
-
-     if (Math.abs(xDiff) > Math.abs(yDiff)) {
-         if (xDiff > 0) {
-             move('left');
-         } else {
-             move('right');
-         }
-     } else {
-         if (yDiff > 0) {
-             move('up');
-         } else {
-             move('down');
-         }
-     }
-
-     xDown = null;
-     yDown = null;
- };
-
- document.addEventListener('touchstart', handleTouchStart, false);
- document.addEventListener('touchmove', handleTouchMove, false);
-
- function initializeGame() {
-     initializeBoard();
-     addRandomTile();
-     addRandomTile();
-     updateBoard();
- }
-
- function getTileColor(number) {
-    switch (number) {
-        case 1:
-            return '#eee4da';
-        case 2:
-            return '#ede0c8';
-        case 3:
-            return '#f2b179';
-        case 4:
-            return '#f59563';
-        case 5:
-            return '#f67c5f';
-        case 6:
-            return '#f65e3b';
-        case 7:
-            return '#edcf72';
-        case 8:
-            return '#edcc61';
-        case 9:
-            return '#edc850';
-        case 10:
-            return '#edc53f';
-        case 11:
-            return '#edc22e';
-        case 12:
-            return '#3c3a32';
-            
-        default:
-            return '';
+  if (Math.abs(deltaX) > Math.abs(deltaY)) {
+    if (deltaX > 0) {
+      moveRight();
+    } else {
+      moveLeft();
     }
-}
+  } else {
+    if (deltaY > 0) {
+      moveDown();
+    } else {
+      moveUp();
+    }
+  }
 
-function updateTile(tileDiv, number) {
-    tileDiv.textContent = number;
-    tileDiv.style.backgroundColor = getTileColor(number);
+  addColours();
 }
