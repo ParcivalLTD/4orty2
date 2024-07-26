@@ -17,6 +17,9 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     document.querySelector(".username").textContent = username;
   }
+  const highscoreSpan = document.querySelector(".highscore");
+  const highscore = localStorage.getItem("highscore") || 0;
+  highscoreSpan.textContent = highscore;
 });
 
 function saveUsername() {
@@ -62,5 +65,4 @@ function displayTopUsers(users) {
   });
 }
 
-// Call the function to fetch and display top users
 fetchTopUsers();

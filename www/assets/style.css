@@ -15,7 +15,10 @@ body {
   display: flex;
   justify-content: center;
   font-family: "Clear Sans", Helvetica, serif;
-}
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  touch-action: manipulation;
 
 .content {
   display: grid;
