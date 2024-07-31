@@ -8,10 +8,48 @@ document.addEventListener("DOMContentLoaded", () => {
   let squares = [];
   let score = 0;
 
-  // create the playing board
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchEndX = 0;
+  let touchEndY = 0;
+
+  function handleGesture() {
+    const deltaX = touchEndX - touchStartX;
+    const deltaY = touchEndY - touchStartY;
+
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (deltaX > 0) {
+        keyRight();
+      } else {
+        keyLeft();
+      }
+    } else {
+      if (deltaY > 0) {
+        keyDown();
+      } else {
+        keyUp();
+      }
+    }
+  }
+
+  document.addEventListener("touchstart", (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+  });
+
+  document.addEventListener("touchmove", (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    touchEndY = e.changedTouches[0].screenY;
+  });
+
+  document.addEventListener("touchend", () => {
+    handleGesture();
+  });
+
   function createBoard() {
     for (let i = 0; i < width * width; i++) {
       const square = document.createElement("div");
+      square.classList.add("square");
       square.innerHTML = 0;
       gridDisplay.appendChild(square);
       squares.push(square);
@@ -21,13 +59,34 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   createBoard();
 
-  //generate a new number
   function generate() {
-    const randomNumber = Math.floor(Math.random() * squares.length);
-    if (squares[randomNumber].innerHTML == 0) {
-      squares[randomNumber].innerHTML = 2;
+    const emptySquares = squares.filter((square) => square.innerHTML == 0);
+    if (emptySquares.length === 0) {
       checkForGameOver();
-    } else generate();
+      return;
+    }
+
+    const probabilities = [
+      { value: 2, probability: 0.66 },
+      { value: 3, probability: 0.2 },
+      { value: 4, probability: 0.1 },
+      { value: 5, probability: 0.04 },
+    ];
+
+    let cumulativeProbability = 0;
+    const cumulativeProbabilities = probabilities.map((item) => {
+      cumulativeProbability += item.probability;
+      return { value: item.value, cumulativeProbability };
+    });
+
+    const random = Math.random();
+
+    const selectedValue = cumulativeProbabilities.find((item) => random <= item.cumulativeProbability).value;
+
+    const randomIndex = Math.floor(Math.random() * emptySquares.length);
+    emptySquares[randomIndex].innerHTML = selectedValue;
+
+    checkForGameOver();
   }
 
   function moveRight() {
@@ -116,31 +175,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function combineRow() {
     for (let i = 0; i < 15; i++) {
-      if (squares[i].innerHTML === squares[i + 1].innerHTML) {
-        let combinedTotal = parseInt(squares[i].innerHTML) + parseInt(squares[i + 1].innerHTML);
+      if (squares[i].innerHTML === squares[i + 1].innerHTML && squares[i].innerHTML != 0) {
+        let combinedTotal = parseInt(squares[i].innerHTML) + 1;
         squares[i].innerHTML = combinedTotal;
         squares[i + 1].innerHTML = 0;
         score += combinedTotal;
         scoreDisplay.innerHTML = score;
       }
     }
-    checkForWin();
   }
 
   function combineColumn() {
     for (let i = 0; i < 12; i++) {
-      if (squares[i].innerHTML === squares[i + width].innerHTML) {
-        let combinedTotal = parseInt(squares[i].innerHTML) + parseInt(squares[i + width].innerHTML);
+      if (squares[i].innerHTML === squares[i + width].innerHTML && squares[i].innerHTML != 0) {
+        let combinedTotal = parseInt(squares[i].innerHTML) + 1;
         squares[i].innerHTML = combinedTotal;
         squares[i + width].innerHTML = 0;
         score += combinedTotal;
         scoreDisplay.innerHTML = score;
       }
     }
-    checkForWin();
   }
 
-  ///assign functions to keys
   function control(e) {
     if (e.key === "ArrowLeft") {
       keyLeft();
@@ -182,17 +238,6 @@ document.addEventListener("DOMContentLoaded", () => {
     generate();
   }
 
-  //check for the number 2048 in the squares to win
-  function checkForWin() {
-    for (let i = 0; i < squares.length; i++) {
-      if (squares[i].innerHTML == 2048) {
-        resultDisplay.innerHTML = "You WIN!";
-        document.removeEventListener("keydown", control);
-        setTimeout(clear, 3000);
-      }
-    }
-  }
-
   function checkForGameOver() {
     let zeros = 0;
     for (let i = 0; i < squares.length; i++) {
@@ -214,7 +259,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (zeros === 0 && noValidMoves) {
-      resultDisplay.innerHTML = "You LOSE!";
+      resultDisplay.innerHTML = "<t id='gameOver'> Game Over! </t>  <i class='fas fa-star'></i> <t id='score'>" + score + "</t>";
       document.removeEventListener("keydown", control);
       setTimeout(clear, 3000);
 
@@ -232,26 +277,31 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!currentHighscore || highscore > currentHighscore) {
       localStorage.setItem("highscore", highscore);
 
-      try {
-        const response = await fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        });
+      if (navigator.onLine) {
+        try {
+          const response = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const resultText = await response.text();
+          console.log("Server response:", resultText);
+
+          const result = JSON.parse(resultText);
+          console.log("Highscore saved:", result);
+        } catch (error) {
+          console.error("Error saving highscore:", error);
         }
-
-        const resultText = await response.text();
-        console.log("Server response:", resultText);
-
-        const result = JSON.parse(resultText);
-        console.log("Highscore saved:", result);
-      } catch (error) {
-        console.error("Error saving highscore:", error);
+      } else {
+        console.log("Device is offline. Highscore will be saved when back online.");
+        localStorage.setItem("pendingHighscore", JSON.stringify(data));
       }
     }
   }
@@ -260,64 +310,49 @@ document.addEventListener("DOMContentLoaded", () => {
     clearInterval(myTimer);
   }
 
-  //add colours
+  function getColor(value) {
+    if (value === 0) return "#add8e6";
+
+    const hue = (Math.log2(value) * 30) % 360;
+    return `hsl(${hue}, 70%, 50%)`;
+  }
+
   function addColours() {
     for (let i = 0; i < squares.length; i++) {
-      if (squares[i].innerHTML == 0) squares[i].style.backgroundColor = "#afa192";
-      else if (squares[i].innerHTML == 2) squares[i].style.backgroundColor = "#eee4da";
-      else if (squares[i].innerHTML == 4) squares[i].style.backgroundColor = "#ede0c8";
-      else if (squares[i].innerHTML == 8) squares[i].style.backgroundColor = "#f2b179";
-      else if (squares[i].innerHTML == 16) squares[i].style.backgroundColor = "#ffcea4";
-      else if (squares[i].innerHTML == 32) squares[i].style.backgroundColor = "#e8c064";
-      else if (squares[i].innerHTML == 64) squares[i].style.backgroundColor = "#ffab6e";
-      else if (squares[i].innerHTML == 128) squares[i].style.backgroundColor = "#fd9982";
-      else if (squares[i].innerHTML == 256) squares[i].style.backgroundColor = "#ead79c";
-      else if (squares[i].innerHTML == 512) squares[i].style.backgroundColor = "#76daff";
-      else if (squares[i].innerHTML == 1024) squares[i].style.backgroundColor = "#beeaa5";
-      else if (squares[i].innerHTML == 2048) squares[i].style.backgroundColor = "#d7d4f0";
+      let value = parseInt(squares[i].innerHTML);
+      squares[i].style.backgroundColor = getColor(value);
+
+      if (value === 0) {
+        squares[i].style.color = "#add8e6";
+      } else {
+        squares[i].style.color = "white";
+      }
     }
   }
+
   addColours();
 
   let myTimer = setInterval(addColours, 50);
 });
 
-let touchStartX = 0;
-let touchStartY = 0;
-let touchEndX = 0;
-let touchEndY = 0;
-
-document.addEventListener("touchstart", handleTouchStart, false);
-document.addEventListener("touchmove", handleTouchMove, false);
-document.addEventListener("touchend", handleTouchEnd, false);
-
-function handleTouchStart(event) {
-  touchStartX = event.changedTouches[0].screenX;
-  touchStartY = event.changedTouches[0].screenY;
-}
-
-function handleTouchMove(event) {
-  touchEndX = event.changedTouches[0].screenX;
-  touchEndY = event.changedTouches[0].screenY;
-}
-
-function handleTouchEnd() {
-  const deltaX = touchEndX - touchStartX;
-  const deltaY = touchEndY - touchStartY;
-
-  if (Math.abs(deltaX) > Math.abs(deltaY)) {
-    if (deltaX > 0) {
-      moveRight();
-    } else {
-      moveLeft();
-    }
+document.addEventListener("DOMContentLoaded", () => {
+  const username = localStorage.getItem("username");
+  if (!username) {
+    window.location.href = "../index.html";
   } else {
-    if (deltaY > 0) {
-      moveDown();
-    } else {
-      moveUp();
-    }
+    setUsername();
   }
+  const highscoreSpan = document.querySelector(".highscore");
+  const highscore = localStorage.getItem("highscore") || 0;
+  highscoreSpan.textContent = highscore;
 
-  addColours();
+  const isDarkMode = localStorage.getItem("darkMode") === "true";
+  if (isDarkMode) {
+    document.body.classList.add("dark-mode");
+  }
+});
+
+function setUsername() {
+  const username = localStorage.getItem("username");
+  document.querySelector(".username").textContent = username;
 }

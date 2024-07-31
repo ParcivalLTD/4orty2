@@ -1,14 +1,8 @@
-@font-face {
-  font-family: ubuntu;
-  src: url(fonts/Ubuntu-Medium.ttf);
-}
-
 html,
 body {
   padding: 0;
   margin: 0;
   height: 100%;
-  font-family: ubuntu;
   background-color: #d1e2e2;
   font-size: 1.1rem;
   overflow: hidden;
@@ -19,6 +13,8 @@ body {
   -webkit-user-select: none;
   -ms-user-select: none;
   touch-action: manipulation;
+  align-items: center;
+}
 
 .content {
   display: grid;
@@ -33,6 +29,7 @@ body {
   height: calc(100% - 2em);
   justify-items: center;
   margin: 1em;
+  width: 100vw;
 }
 
 .header {
@@ -40,10 +37,26 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #5e7776;
+  background-color: #7d9999;
   width: 100%;
   border-radius: 0.75em;
-  justify-content: center;
+  color: #d1e2e2;
+  font-size: 1.5em;
+  justify-content: space-between;
+  padding: 0 1em;
+}
+
+.headerG {
+  display: fixed;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #7d9999;
+  width: 100%;
+  border-radius: 0.75em;
+  color: #d1e2e2;
+  font-size: 1.5em;
+  justify-content: space-between;
+  padding: 0 1em;
 }
 
 .user-info {
@@ -55,16 +68,19 @@ body {
 }
 
 .status-dot {
-  position: absolute;
-  top: 1.5em;
-  right: 1em;
-  width: 10px;
-  height: 10px;
+  width: 0.75em;
+  height: 0.75em;
   border-radius: 50%;
-  background-color: green;
-  margin-right: 10px;
+  display: inline-block;
 }
 
+.status-dot.online {
+  background-color: green;
+}
+
+.status-dot.offline {
+  background-color: grey;
+}
 .online {
   background-color: green;
 }
@@ -83,14 +99,16 @@ body {
   width: 100%;
   border-radius: 0.75em;
   color: #d1e2e2;
+  font-size: 1.5em;
 }
 
 .main {
   grid-area: main;
-  /*   display: flex;
+  font-size: 3vh;
+  display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center; */
+  align-items: center;
 }
 
 .button-list {
@@ -111,13 +129,13 @@ body {
 button {
   margin: 0 5px;
   font-size: 1.05em;
-  font-family: ubuntu;
   padding: 10px 20px;
   border-radius: 0.7em;
   border: #5e7776 solid 0.3em;
   background-color: #d1e2e2;
   color: #5e7776;
   cursor: pointer;
+  transition: width 0.3s ease, height 0.3s ease;
 }
 
 button:active {
@@ -125,42 +143,20 @@ button:active {
   color: #d1e2e2;
 }
 
+h1 {
+  text-align: center;
+}
+
 #back {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background-color: #4c6154;
+  background-color: #5e7776;
   color: #d1e2e2;
-  border: none;
+  border: 5px solid #d1e2e2;
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.game,
-.menu {
-  display: none;
-}
-
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgb(0, 0, 0);
-  background-color: rgba(0, 0, 0, 0.4);
-}
-
-.modal-content {
-  background-color: #fefefe;
-  margin: 15% auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%;
 }
 
 .info {
@@ -172,25 +168,28 @@ button:active {
 .grid {
   display: flex;
   flex-wrap: wrap;
-  width: 456px;
-  height: 456px;
-  background-color: #bbada0;
-  border: 7px solid #bbada0;
+  width: 90vw;
+  max-width: 450px;
+  height: 90vw;
+  max-height: 450px;
+  background-color: #87b1bf;
+  border: 7px solid #87b1bf;
   border-radius: 6px;
   margin-top: 20px;
 }
 
 .grid div {
-  width: 100px;
-  height: 100px;
+  width: calc(25% - 14px);
+  height: calc(25% - 14px);
   margin: 7px;
   border-radius: 3px;
-  background-color: #eee4da;
-  color: #afa192;
   font-weight: bold;
   text-align: center;
-  font-size: 60px;
   line-height: 1.6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5em;
 }
 
 .score-container {
@@ -203,9 +202,97 @@ button:active {
 }
 
 #score {
-  font-size: 30px;
+  font-size: 35px;
+  font-weight: bolder;
+  letter-spacing: 1vw;
 }
 
-.score-title {
-  font-size: 16px;
+#result {
+  font-size: 1.5em;
+  align-self: flex-end;
+  margin-bottom: 0;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.user-info2 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#headerItemF {
+  display: flex;
+  line-height: 1.5em;
+  vertical-align: middle;
+  gap: 0.5em;
+  align-items: center;
+  justify-content: left;
+}
+
+.user-info i,
+.user-info span {
+  margin-right: 15px;
+}
+
+dialog {
+  border: none;
+  border-radius: 0.75em;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  padding: 20px;
+  background-color: #ffffff;
+  max-width: 500px;
+  width: 60%;
+  text-align: center;
+}
+
+input {
+  border: 3px solid #d1e2e2 !important;
+}
+
+body.dark-mode dialog {
+  background-color: #242828;
+  color: #ffffff;
+}
+
+body.dark-mode {
+  background-color: #475252;
+  color: #ffffff;
+}
+
+body.dark-mode button,
+body.dark-mode input,
+body.dark-mode input:focus {
+  background-color: #333333;
+  color: #ffffff;
+}
+
+#title {
+  font-size: 3em;
+  font-weight: bold;
+  color: #9cb0b0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  margin: 20px 0;
+}
+
+.square {
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+#gameOver {
+  color: rgb(198, 120, 120);
+}
+
+.error {
+  color: rgb(198, 120, 120);
 }
