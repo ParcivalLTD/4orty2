@@ -4,6 +4,81 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const { MongoClient, ServerApiVersion } = require("mongodb");
 
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
+const secretKey = process.env.JWT_SECRET_KEY || "magomedalimkhanov123";
+
+// Registrierung
+app.post("/register", async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ error: "Username and password are required" });
+  }
+
+  try {
+    await client.connect();
+    const database = client.db("game");
+    const usersCollection = database.collection("users");
+
+    // Überprüfen, ob der Benutzername bereits existiert
+    const existingUser = await usersCollection.findOne({ username });
+    if (existingUser) {
+      return res.status(400).json({ error: "Username already exists" });
+    }
+
+    // Passwort hashen
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Benutzer speichern
+    const result = await usersCollection.insertOne({ username, password: hashedPassword });
+    res.status(201).json({ message: `User registered with id: ${result.insertedId}` });
+  } catch (error) {
+    console.error("Error registering user:", error);
+    res.status(500).json({ error: "Error registering user" });
+  } finally {
+    await client.close();
+  }
+});
+
+// Anmeldung
+app.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ error: "Username and password are required" });
+  }
+
+  try {
+    await client.connect();
+    const database = client.db("game");
+    const usersCollection = database.collection("users");
+
+    // Benutzer finden
+    const user = await usersCollection.findOne({ username });
+    if (!user) {
+      return res.status(400).json({ error: "Invalid username or password" });
+    }
+
+    // Passwort überprüfen
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(400).json({ error: "Invalid username or password" });
+    }
+
+    // JWT Token erstellen
+    const token = jwt.sign({ username: user.username }, secretKey, { expiresIn: "1h" });
+
+    res.status(200).json({ message: "Login successful", token });
+  } catch (error) {
+    console.error("Error logging in user:", error);
+    res.status(500).json({ error: "Error logging in user" });
+  } finally {
+    await client.close();
+  }
+});
+
 const username = process.env.MONGODB_USERNAME;
 const password = process.env.MONGODB_PASSWORD;
 const uri = `mongodb+srv://${username}:${password}@cluster0.yzppio2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
