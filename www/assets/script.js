@@ -5,6 +5,8 @@ function play() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  showLoginForm();
+
   const username = localStorage.getItem("username");
   const authModal = document.getElementById("authDialog");
   if (!username) {
@@ -142,41 +144,70 @@ async function registerUser() {
       errorElement.textContent = "";
     } else {
       const error = await response.json();
-      errorElement.textContent = error.message;
+      switch (error.code) {
+        case "USERNAME_EXISTS":
+          errorElement.textContent = "Username already exists.";
+          break;
+        case "EMAIL_EXISTS":
+          errorElement.textContent = "Email already exists.";
+          break;
+        case "PASSWORD_INSECURE":
+          errorElement.textContent = "Password is insecure.";
+          break;
+        default:
+          errorElement.textContent = error.message;
+      }
     }
   } catch (error) {
     errorElement.textContent = "Registration failed. Please try again.";
   }
 }
 
-async function loginUser() {
+function loginUser() {
   const username = document.getElementById("loginUsername").value;
   const password = document.getElementById("loginPassword").value;
-  const errorElement = document.getElementById("username-error");
 
-  try {
-    const response = await fetch(`${backendUrl}/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, password }),
+  fetch("https://fourorty2.onrender.com/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ username, password }),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        return response.json().then((data) => {
+          switch (data.code) {
+            case "INVALID_CREDENTIALS":
+              throw new Error("Invalid username or password.");
+            case "USER_NOT_FOUND":
+              throw new Error("User not found.");
+            default:
+              throw new Error(data.message || "Bad Request");
+          }
+        });
+      }
+      return response.json();
+    })
+    .then((data) => {
+      console.log("Login successful:", data);
+      document.getElementById("auth-error").textContent = ""; // Clear any previous errors
+    })
+    .catch((error) => {
+      document.getElementById("auth-error").textContent = error.message;
     });
-
-    if (response.ok) {
-      const result = await response.json();
-      document.getElementById("usernameModal").close();
-      setUsername(result.username);
-      errorElement.textContent = "";
-    } else {
-      const error = await response.json();
-      errorElement.textContent = error.message;
-    }
-  } catch (error) {
-    errorElement.textContent = "Login failed. Please try again.";
-  }
 }
 
 function setUsername(username) {
   document.querySelector(".username").textContent = username;
+}
+
+function showLoginForm() {
+  document.getElementById("loginForm").style.display = "block";
+  document.getElementById("registerForm").style.display = "none";
+}
+
+function showRegisterForm() {
+  document.getElementById("loginForm").style.display = "none";
+  document.getElementById("registerForm").style.display = "block";
 }
