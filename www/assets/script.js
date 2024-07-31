@@ -126,7 +126,7 @@ async function registerUser() {
   const username = document.getElementById("registerUsername").value;
   const password = document.getElementById("registerPassword").value;
   const email = document.getElementById("registerEmail").value;
-  const errorElement = document.getElementById("username-error");
+  const errorElement = document.getElementById("auth-error");
 
   try {
     const response = await fetch(`${backendUrl}/register`, {
