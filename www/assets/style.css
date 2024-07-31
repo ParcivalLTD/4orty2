@@ -257,6 +257,8 @@ dialog {
 
 input {
   border: 3px solid #d1e2e2 !important;
+  border-radius: 0.5em;
+  padding: 3px 12px;
 }
 
 body.dark-mode dialog {
@@ -299,4 +301,14 @@ body.dark-mode input:focus {
 #reset {
   font-size: 0.8em;
   padding: 5px 10px;
+}
+
+.active-button {
+  background-color: #4caf50 !important;
+  color: white !important;
+}
+
+input:focus,
+button:focus {
+  outline: none;
 }

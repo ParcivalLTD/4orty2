@@ -205,9 +205,15 @@ function setUsername(username) {
 function showLoginForm() {
   document.getElementById("loginForm").style.display = "block";
   document.getElementById("registerForm").style.display = "none";
+
+  document.querySelector("button[onclick='showLoginForm()']").classList.add("active-button");
+  document.querySelector("button[onclick='showRegisterForm()']").classList.remove("active-button");
 }
 
 function showRegisterForm() {
   document.getElementById("loginForm").style.display = "none";
   document.getElementById("registerForm").style.display = "block";
+
+  document.querySelector("button[onclick='showRegisterForm()']").classList.add("active-button");
+  document.querySelector("button[onclick='showLoginForm()']").classList.remove("active-button");
 }
