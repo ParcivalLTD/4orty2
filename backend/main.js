@@ -173,6 +173,38 @@ app.post("/gethighscore", async (req, res) => {
   }
 });
 
+app.post("/update-username", async (req, res) => {
+  const { oldUsername, newUsername } = req.body;
+
+  if (!oldUsername || !newUsername) {
+    return res.status(400).json({ error: "Old and new username are required" });
+  }
+
+  try {
+    await client.connect();
+    const database = client.db("game");
+    const usersCollection = database.collection("users");
+
+    const existingUser = await usersCollection.findOne({ username: newUsername });
+    if (existingUser) {
+      return res.status(400).json({ error: "New username already exists" });
+    }
+
+    const result = await usersCollection.updateOne({ username: oldUsername }, { $set: { username: newUsername } });
+
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({ error: "Old username not found" });
+    }
+
+    res.status(200).json({ message: "Username updated successfully" });
+  } catch (error) {
+    console.error("Error updating username:", error);
+    res.status(500).json({ error: "Error updating username" });
+  } finally {
+    await client.close();
+  }
+});
+
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
 });

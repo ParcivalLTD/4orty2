@@ -29,6 +29,7 @@ async function closeSettingsDialog() {
   const newUsername = document.getElementById("usernameInput").value;
   const errorElement = document.getElementById("settings-error");
   const dialog = document.getElementById("settingsDialog");
+  const oldUsername = localStorage.getItem("username");
 
   if (newUsername && newUsername.length <= 10) {
     try {
@@ -45,10 +46,23 @@ async function closeSettingsDialog() {
         if (result.exists) {
           errorElement.textContent = "Username already exists.";
         } else {
-          localStorage.setItem("username", newUsername);
-          setUsername(newUsername);
-          errorElement.textContent = "";
-          dialog.close();
+          const updateResponse = await fetch(`${backendUrl}/update-username`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ oldUsername, newUsername }),
+          });
+
+          if (updateResponse.ok) {
+            localStorage.setItem("username", newUsername);
+            setUsername(newUsername);
+            errorElement.textContent = "";
+            dialog.close();
+          } else {
+            const updateError = await updateResponse.json();
+            errorElement.textContent = updateError.error;
+          }
         }
       } else {
         const error = await response.json();
