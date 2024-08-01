@@ -100,10 +100,8 @@ async function saveHighscore(username, highscore) {
     }
 
     const resultText = await response.text();
-    console.log("Server response:", resultText);
 
     const result = JSON.parse(resultText);
-    console.log("Highscore saved:", result);
   } catch (error) {
     console.error("Error saving highscore:", error);
     localStorage.setItem("pendingHighscore", JSON.stringify(data));
@@ -237,8 +235,6 @@ async function loginUser() {
           localStorage.setItem("highscore", highscore);
           const highscoreSpan = document.querySelector(".highscore");
           highscoreSpan.textContent = highscore;
-
-          console.log(data);
 
           setUsername(username);
           document.getElementById("authDialog").close();

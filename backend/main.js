@@ -184,16 +184,21 @@ app.post("/update-username", async (req, res) => {
     await client.connect();
     const database = client.db("game");
     const usersCollection = database.collection("users");
+    const highscoresCollection = database.collection("highscores");
 
     const existingUser = await usersCollection.findOne({ username: newUsername });
     if (existingUser) {
       return res.status(400).json({ error: "New username already exists" });
     }
 
-    const result = await usersCollection.updateOne({ username: oldUsername }, { $set: { username: newUsername } });
-
-    if (result.modifiedCount === 0) {
+    const userUpdateResult = await usersCollection.updateOne({ username: oldUsername }, { $set: { username: newUsername } });
+    if (userUpdateResult.modifiedCount === 0) {
       return res.status(404).json({ error: "Old username not found" });
+    }
+
+    const highscoreUpdateResult = await highscoresCollection.updateOne({ username: oldUsername }, { $set: { username: newUsername } });
+    if (highscoreUpdateResult.modifiedCount === 0) {
+      console.warn("Old username not found in highscores collection");
     }
 
     res.status(200).json({ message: "Username updated successfully" });
