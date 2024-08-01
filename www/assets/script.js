@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!username) {
     authModal.showModal();
   } else {
-    setUsername();
+    setUsername(username);
   }
   const highscoreSpan = document.querySelector(".highscore");
   const highscore = localStorage.getItem("highscore") || 0;
@@ -61,6 +61,33 @@ async function closeSettingsDialog() {
     errorElement.textContent = "Username must be 10 characters or less.";
   } else {
     dialog.close();
+  }
+}
+
+async function saveHighscore(username, highscore) {
+  const data = { username, highscore };
+
+  try {
+    const response = await fetch(backendUrl + "/savehighscores", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const resultText = await response.text();
+    console.log("Server response:", resultText);
+
+    const result = JSON.parse(resultText);
+    console.log("Highscore saved:", result);
+  } catch (error) {
+    console.error("Error saving highscore:", error);
+    localStorage.setItem("pendingHighscore", JSON.stringify(data));
   }
 }
 
@@ -150,9 +177,10 @@ async function registerUser() {
 
     if (response.ok) {
       const result = await response.json();
-      document.getElementById("authDialog").close();
-      setUsername(result.username);
       errorElement.textContent = "";
+      saveHighscore(username, 0);
+      showLoginForm();
+      document.getElementById("loginUsername").value = username;
     } else {
       const error = await response.json();
       errorElement.textContent = error.error;
@@ -174,35 +202,35 @@ function loginUser() {
     },
     body: JSON.stringify({ username, password }),
   })
-    .then((response) => {
-      if (!response.ok) {
-        return response.json().then((data) => {
-          errorElement.textContent = data.error;
-        });
+    .then((response) => response.json().then((data) => ({ status: response.status, data })))
+    .then(({ status, data }) => {
+      if (status !== 200) {
+        errorElement.textContent = data.error;
+      } else {
+        errorElement.textContent = "";
+        if (data.message == "Login successful") {
+          errorElement.style.color = "green";
+          errorElement.textContent = data.message;
+          localStorage.setItem("username", username);
+          localStorage.setItem("isLoggedIn", true);
+          localStorage.setItem("highscore", data.highscore);
+
+          setUsername(username);
+          document.getElementById("authDialog").close();
+        }
       }
-      return response.json();
-    })
-    .then((data) => {
-      errorElement.textContent = data;
-      /* document.getElementById("auth-error").textContent = "";
-
-      localStorage.setItem("username", username);
-      localStorage.setItem("isLoggedIn", true);
-
-      setUsername(username);
-      document.getElementById("authDialog").close(); */
     })
     .catch((error) => {
-      document.getElementById("auth-error").textContent = error.message;
+      errorElement.textContent = error.message;
     });
 }
 
 function logoutUser() {
-  // Clear user data from localStorage
   localStorage.removeItem("username");
   localStorage.removeItem("isLoggedIn");
+  localStorage.removeItem("highscore");
+  localStorage.removeItem("gameState");
 
-  // Optionally, redirect to the login page or refresh the current page
   window.location.reload();
 }
 
