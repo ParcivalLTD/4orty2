@@ -25,29 +25,39 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-/* function saveUsername() {
-  const username = document.getElementById("username-input").value;
-  const errorElement = document.getElementById("username-error");
-  if (username && username.length <= 10) {
-    document.getElementById("usernameModal").close();
-    localStorage.setItem("username", username);
-    setUsername(newUsername);
-    errorElement.textContent = "";
-  } else {
-    errorElement.textContent = "Username must be 10 characters or less.";
-  }
-} */
-
-function closeSettingsDialog() {
+async function closeSettingsDialog() {
   const newUsername = document.getElementById("usernameInput").value;
   const errorElement = document.getElementById("settings-error");
   const dialog = document.getElementById("settingsDialog");
+
   if (newUsername && newUsername.length <= 10) {
-    localStorage.setItem("username", newUsername);
-    setUsername(newUsername);
-    errorElement.textContent = "";
-    dialog.close();
-  } else if (newUsername && newUsername.length >= 10) {
+    try {
+      const response = await fetch(`${backendUrl}/check-username`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username: newUsername }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.exists) {
+          errorElement.textContent = "Username already exists.";
+        } else {
+          localStorage.setItem("username", newUsername);
+          setUsername(newUsername);
+          errorElement.textContent = "";
+          dialog.close();
+        }
+      } else {
+        const error = await response.json();
+        errorElement.textContent = error.error;
+      }
+    } catch (error) {
+      errorElement.textContent = error.message;
+    }
+  } else if (newUsername && newUsername.length > 10) {
     errorElement.textContent = "Username must be 10 characters or less.";
   } else {
     dialog.close();
@@ -55,7 +65,7 @@ function closeSettingsDialog() {
 }
 
 async function fetchTopUsers() {
-  const url = "https://fourorty2.onrender.com/topusers";
+  const url = backendUrl + "/topusers";
 
   try {
     const response = await fetch(url, {
@@ -108,8 +118,9 @@ function displayTopUsersInModal() {
 }
 
 function openSettingsDialog() {
-  const dialog = document.getElementById("settingsDialog");
-  dialog.showModal();
+  const currentUsername = localStorage.getItem("username");
+  document.getElementById("usernameInput").value = currentUsername;
+  document.getElementById("settingsDialog").showModal();
 }
 
 function toggleDarkMode() {
@@ -139,35 +150,24 @@ async function registerUser() {
 
     if (response.ok) {
       const result = await response.json();
-      document.getElementById("usernameModal").close();
+      document.getElementById("authDialog").close();
       setUsername(result.username);
       errorElement.textContent = "";
     } else {
       const error = await response.json();
-      switch (error.code) {
-        case "USERNAME_EXISTS":
-          errorElement.textContent = "Username already exists.";
-          break;
-        case "EMAIL_EXISTS":
-          errorElement.textContent = "Email already exists.";
-          break;
-        case "PASSWORD_INSECURE":
-          errorElement.textContent = "Password is insecure.";
-          break;
-        default:
-          errorElement.textContent = error.message;
-      }
+      errorElement.textContent = error.error;
     }
   } catch (error) {
-    errorElement.textContent = "Registration failed. Please try again.";
+    errorElement.textContent = error.message;
   }
 }
 
 function loginUser() {
   const username = document.getElementById("loginUsername").value;
   const password = document.getElementById("loginPassword").value;
+  const errorElement = document.getElementById("auth-error");
 
-  fetch("https://fourorty2.onrender.com/login", {
+  fetch(backendUrl + "/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -177,25 +177,33 @@ function loginUser() {
     .then((response) => {
       if (!response.ok) {
         return response.json().then((data) => {
-          switch (data.code) {
-            case "INVALID_CREDENTIALS":
-              throw new Error("Invalid username or password.");
-            case "USER_NOT_FOUND":
-              throw new Error("User not found.");
-            default:
-              throw new Error(data.message || "Bad Request");
-          }
+          errorElement.textContent = data.error;
         });
       }
       return response.json();
     })
     .then((data) => {
-      console.log("Login successful:", data);
-      document.getElementById("auth-error").textContent = ""; // Clear any previous errors
+      errorElement.textContent = data;
+      /* document.getElementById("auth-error").textContent = "";
+
+      localStorage.setItem("username", username);
+      localStorage.setItem("isLoggedIn", true);
+
+      setUsername(username);
+      document.getElementById("authDialog").close(); */
     })
     .catch((error) => {
       document.getElementById("auth-error").textContent = error.message;
     });
+}
+
+function logoutUser() {
+  // Clear user data from localStorage
+  localStorage.removeItem("username");
+  localStorage.removeItem("isLoggedIn");
+
+  // Optionally, redirect to the login page or refresh the current page
+  window.location.reload();
 }
 
 function setUsername(username) {

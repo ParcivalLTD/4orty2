@@ -64,7 +64,6 @@ app.get("/topusers", async (req, res) => {
   }
 });
 
-// Registrierung
 app.post("/register", async (req, res) => {
   const { username, password } = req.body;
 
@@ -77,16 +76,12 @@ app.post("/register", async (req, res) => {
     const database = client.db("game");
     const usersCollection = database.collection("users");
 
-    // Überprüfen, ob der Benutzername bereits existiert
     const existingUser = await usersCollection.findOne({ username });
     if (existingUser) {
       return res.status(400).json({ error: "Username already exists" });
     }
 
-    // Passwort hashen
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Benutzer speichern
     const result = await usersCollection.insertOne({ username, password: hashedPassword });
     res.status(201).json({ message: `User registered with id: ${result.insertedId}` });
   } catch (error) {
@@ -97,9 +92,19 @@ app.post("/register", async (req, res) => {
   }
 });
 
-// Anmeldung
+app.post("/check-username", async (req, res) => {
+  const { username } = req.body;
+  const user = await database.findUserByUsername(username); // Passen Sie dies an Ihre Datenbankabfrage an
+  if (user) {
+    res.json({ exists: true });
+  } else {
+    res.json({ exists: false });
+  }
+});
+
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
+  console.log("Received login request:", { username, password });
 
   if (!username || !password) {
     return res.status(400).json({ error: "Username and password are required" });
@@ -110,19 +115,16 @@ app.post("/login", async (req, res) => {
     const database = client.db("game");
     const usersCollection = database.collection("users");
 
-    // Benutzer finden
     const user = await usersCollection.findOne({ username });
     if (!user) {
       return res.status(400).json({ error: "Invalid username or password" });
     }
 
-    // Passwort überprüfen
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(400).json({ error: "Invalid username or password" });
     }
 
-    // JWT Token erstellen
     const token = jwt.sign({ username: user.username }, secretKey, { expiresIn: "1h" });
 
     res.status(200).json({ message: "Login successful", token });
