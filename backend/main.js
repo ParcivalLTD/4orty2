@@ -125,7 +125,6 @@ app.post("/login", async (req, res) => {
     }
 
     const token = jwt.sign({ username }, secretKey, { expiresIn: "1h" });
-    res.status(200).json({ token, username });
 
     const highscoresCollection = database.collection("highscores");
     const userHighscore = await highscoresCollection.findOne({ username });
