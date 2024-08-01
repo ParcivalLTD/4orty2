@@ -94,14 +94,25 @@ app.post("/register", async (req, res) => {
 
 app.post("/check-username", async (req, res) => {
   const { username } = req.body;
-  const user = await database.findUserByUsername(username);
-  if (user) {
-    res.json({ exists: true });
-  } else {
-    res.json({ exists: false });
+
+  try {
+    await client.connect();
+    const database = client.db("game");
+    const usersCollection = database.collection("users");
+
+    const user = await usersCollection.findOne({ username });
+    if (user) {
+      res.json({ exists: true });
+    } else {
+      res.json({ exists: false });
+    }
+  } catch (error) {
+    console.error("Error checking username:", error);
+    res.status(500).json({ error: "Error checking username" });
+  } finally {
+    await client.close();
   }
 });
-
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
   console.log("Received login request:", { username, password });

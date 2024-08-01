@@ -195,10 +195,11 @@ async function registerUser() {
   }
 }
 
-function loginUser() {
+async function loginUser() {
   const username = document.getElementById("loginUsername").value;
   const password = document.getElementById("loginPassword").value;
   const errorElement = document.getElementById("auth-error");
+  let highscore = (await getHighscore(username)) || 0;
 
   fetch(backendUrl + "/login", {
     method: "POST",
@@ -218,7 +219,7 @@ function loginUser() {
           errorElement.textContent = data.message;
           localStorage.setItem("username", username);
           localStorage.setItem("isLoggedIn", true);
-          let highscore = getHighscore(username) || 0;
+
           localStorage.setItem("highscore", highscore);
           const highscoreSpan = document.querySelector(".highscore");
           highscoreSpan.textContent = highscore;
