@@ -65,6 +65,11 @@ async function closeSettingsDialog() {
 }
 
 async function saveHighscore(username, highscore) {
+  if (!username || highscore === undefined || highscore === null) {
+    console.error("Username and highscore are required");
+    return;
+  }
+
   const data = { username, highscore };
 
   try {
@@ -77,7 +82,7 @@ async function saveHighscore(username, highscore) {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      document.getElementById("auth-error").textContent = response.statusText;
     }
 
     const resultText = await response.text();
