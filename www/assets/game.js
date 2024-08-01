@@ -297,10 +297,17 @@ function checkForGameOver() {
   if (zeros === 0 && noValidMoves) {
     resultDisplay.innerHTML = "<t id='gameOver'> Game Over! </t>  <i class='fas fa-star'></i> <t id='score'>" + score + "</t>";
     document.removeEventListener("keydown", control);
-    setTimeout(clear, 3000);
+    setTimeout(resetGame, 5000);
+
+    window.addEventListener("beforeunload", (event) => {
+      resetGame();
+    });
 
     let username = localStorage.getItem("username");
     saveHighscore(username, score);
+    if (score > localStorage.getItem("highscore")) {
+      document.querySelector(".highscore").textContent = score;
+    }
   }
 }
 
@@ -329,15 +336,12 @@ async function saveHighscore(username, highscore) {
         }
 
         const resultText = await response.text();
-        console.log("Server response:", resultText);
 
         const result = JSON.parse(resultText);
-        console.log("Highscore saved:", result);
       } catch (error) {
         console.error("Error saving highscore:", error);
       }
     } else {
-      console.log("Device is offline. Highscore will be saved when back online.");
       localStorage.setItem("pendingHighscore", JSON.stringify(data));
     }
   }

@@ -35,10 +35,8 @@ window.addEventListener("online", async function () {
       }
 
       const resultText = await response.text();
-      console.log("Server response:", resultText);
 
       const result = JSON.parse(resultText);
-      console.log("Highscore saved:", result);
 
       localStorage.removeItem("pendingHighscore");
     } catch (error) {
@@ -49,4 +47,16 @@ window.addEventListener("online", async function () {
 
 document.addEventListener("deviceready", () => {
   cordova.plugins.smoothScroll.enable();
+});
+
+function animateButtonShrink(event) {
+  const button = event.target;
+  button.classList.add("shrink");
+  setTimeout(() => {
+    button.classList.remove("shrink");
+  }, 100);
+}
+
+document.querySelectorAll("button").forEach((button) => {
+  button.addEventListener("click", animateButtonShrink);
 });

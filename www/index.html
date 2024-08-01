@@ -13,16 +13,12 @@
     <div class="content">
       <div class="header">
         <div class="user-info">
-          <i class="fas fa-user"></i> <span class="username">Username</span>
+          <i class="fas fa-user"></i> <span class="username">-</span>
           <i class="fas fa-trophy"></i> <span class="highscore">Highscore</span>
         </div>
-        <button id="logout" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i></button>
         <div class="status-dot online"></div>
       </div>
 
-      <div class="footer">
-        <span class="copyright">© Julian Gabriel</span>
-      </div>
       <div class="main">
         <span id="title">4orty2</span>
         <ul class="button-list">
@@ -35,8 +31,12 @@
           <li>
             <button onclick="showScoreBoard()"><i class="fas fa-list"></i> scoreboard</button>
           </li>
+          
           <li>
-            <button onclick="exitGame()"><i class="fas fa-sign-out-alt"></i> exit</button>
+            <button id="logout" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> logout</button>
+          </li>
+          <li>
+            <button onclick="exitGame()"><i class="fa-solid fa-xmark"></i> exit</button>
           </li>
         </ul>
         <div id="top-users"></div>
@@ -61,40 +61,61 @@
           <input type="checkbox" id="darkModeToggle" name="darkModeToggle" onchange="toggleDarkMode()" />
           <br />
           <label for="usernameInput">Change Username:</label>
-          <input type="text" class="form-control" id="usernameInput" name="usernameInput" style="display: inline-block;" />
+          <input type="text" id="usernameInput" name="usernameInput" style="display: inline-block;" />
           <br />  <div id="settings-error" class="error"></div> 
+          <br>
           <button type="button" onclick="closeSettingsDialog()">Save</button>
       </dialog>
 
       <dialog id="authDialog">
         <h2><i class="fas fa-lock"></i> Authentication</h2>
+        <br>
         <button type="button" onclick="showLoginForm()">Login</button>
         <button type="button" onclick="showRegisterForm()">Register</button>
         <br /><br />
         
         <form id="loginForm" method="dialog" onsubmit="loginUser(); return false;" style="display: none;">
-          <label for="loginUsername">Username:</label>
-          <input type="text" id="loginUsername" name="loginUsername" required />
-          <br />
-          <label for="loginPassword">Password:</label>
-          <input type="password" id="loginPassword" name="loginPassword" required />
-          <br /><br>
+          <input type="text" id="loginUsername" name="loginUsername" placeholder="Username" required />
+          <input type="password" id="loginPassword" name="loginPassword" placeholder="Password" required /><br>
           <button type="submit">Login</button>
         </form>
         
         <form id="registerForm" method="dialog" onsubmit="registerUser(); return false;" style="display: none;">
-          <label for="registerUsername">Username:</label>
-          <input type="text" id="registerUsername" name="registerUsername" required />
-          <br />
-          <label for="registerPassword">Password:</label>
-          <input type="password" id="registerPassword" name="registerPassword" required />
-          <br />
-          <label for="registerEmail">Email:</label><br>
-          <input type="email" id="registerEmail" name="registerEmail" required />
-          <br /><br>
+          <input type="text" id="registerUsername" placeholder="Username" name="registerUsername" required />
+          <input type="password" id="registerPassword" placeholder="Password" name="registerPassword" required />
+          <input type="email" id="registerEmail" placeholder="Email" name="registerEmail" required />
+          <br>
           <button type="submit">Register</button>
-        </form><br>
+        </form>
         <div id="auth-error" class="error"></div>
+        <br>
+      </dialog>
+
+      <div class="footer">
+        <a href="#" id="footerLink" onclick="openContactDialog()">contact</a>
+        <a href="#" id="footerLink" onclick="openImpressumDialog()">imprint</a>
+      </div>
+      
+      <dialog id="contactDialog">
+        <h2>Contact</h2>
+        <p>You can reach use under this email: <a href="mailto:juliangabriel570@gmail.com">juliangabriel570@gmail.com</a></p>
+        <form method="dialog">
+          <button>Close</button>
+        </form>
+      </dialog>
+      
+      <dialog id="impressumDialog">
+        <h2>Imprint</h2>
+        <p>
+          <strong>Company Name:</strong> coding_academy<br>
+          <strong>Address:</strong> WIFI Linz<br>
+          <strong>Phone Number:</strong> +43 677 62452660<br>
+          <strong>Email:</strong> <a href="mailto:juliangabriel570@gmail.com">juliangabriel570@gmail.com</a><br>
+          <strong>Website:</strong> <a href="http://wavebeef.com">wavebeef.com</a><br>
+        </p>
+        <form method="dialog">
+          <button>Close</button>
+        </form>
       </dialog>
 
       <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

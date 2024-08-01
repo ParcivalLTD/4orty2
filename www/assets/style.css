@@ -251,7 +251,7 @@ dialog {
   padding: 20px;
   background-color: #ffffff;
   max-width: 500px;
-  width: 60%;
+  width: 80%;
   text-align: center;
 }
 
@@ -287,15 +287,14 @@ body.dark-mode input:focus {
   margin: 20px 0;
 }
 
-.square {
-}
-
 #gameOver {
   color: rgb(198, 120, 120);
 }
 
 .error {
   color: rgb(198, 120, 120);
+  font-size: 0.8em;
+  margin-top: 10px;
 }
 
 #reset {
@@ -310,5 +309,36 @@ body.dark-mode input:focus {
 
 input:focus,
 button:focus {
-  outline: none;
+  outline: none !important;
+}
+
+button.shrink {
+  transform: scale(0.93);
+  transition: transform 0.1s ease;
+}
+
+button:hover {
+  transform: scale(0.97);
+}
+
+#registerForm input {
+  margin-bottom: 10px;
+  width: 40%;
+}
+#registerForm input:last-of-type {
+  width: calc(80% + 5px);
+}
+
+#loginForm input {
+  margin-bottom: 10px;
+  width: 80%;
+}
+
+#footerLink {
+  color: #d1e2e2;
+  font-size: 0.9em;
+}
+
+.footer a:last-of-type {
+  margin-left: 10px !important;
 }

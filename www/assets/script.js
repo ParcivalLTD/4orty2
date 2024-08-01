@@ -31,6 +31,11 @@ async function closeSettingsDialog() {
   const dialog = document.getElementById("settingsDialog");
   const oldUsername = localStorage.getItem("username");
 
+  if (newUsername === oldUsername) {
+    dialog.close();
+    return;
+  }
+
   if (newUsername && newUsername.length <= 10) {
     try {
       const response = await fetch(`${backendUrl}/check-username`, {
@@ -144,8 +149,8 @@ function exitGame() {
 
 function displayTopUsersInModal() {
   const topUsersContainer = document.querySelector("#top-users-modal-body");
-  topUsersContainer.innerHTML = "";
 
+  topUsersContainer.innerHTML = "";
   fetchTopUsers()
     .then((users) => {
       const topThreeUsers = users.slice(0, 3);
@@ -158,9 +163,9 @@ function displayTopUsersInModal() {
     })
     .catch((error) => {
       console.error("Error fetching top users:", error);
-    });
+    })
+    .finally(() => {});
 }
-
 function openSettingsDialog() {
   const currentUsername = localStorage.getItem("username");
   document.getElementById("usernameInput").value = currentUsername;
@@ -182,6 +187,23 @@ async function registerUser() {
   const password = document.getElementById("registerPassword").value;
   const email = document.getElementById("registerEmail").value;
   const errorElement = document.getElementById("auth-error");
+  const registerButton = document.querySelector("#registerForm button[type='submit']");
+  const spinner = document.createElement("i");
+  spinner.className = "fas fa-spinner fa-spin";
+  registerButton.innerHTML = spinner.outerHTML;
+
+  if (username.length > 10) {
+    errorElement.textContent = "Username must be at most 10 characters long";
+    registerButton.innerHTML = "Register";
+    return;
+  }
+
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+  if (!passwordRegex.test(password)) {
+    errorElement.textContent = "Password must contain at least 8 characters, one letter, and one number";
+    registerButton.innerHTML = "Register";
+    return;
+  }
 
   try {
     const response = await fetch(`${backendUrl}/register`, {
@@ -204,13 +226,19 @@ async function registerUser() {
     }
   } catch (error) {
     errorElement.textContent = error.message;
+  } finally {
+    registerButton.innerHTML = "Register";
   }
 }
-
 async function loginUser() {
   const username = document.getElementById("loginUsername").value;
   const password = document.getElementById("loginPassword").value;
   const errorElement = document.getElementById("auth-error");
+  const loginButton = document.querySelector("#loginForm button[type='submit']");
+  const spinner = document.createElement("i");
+  spinner.className = "fas fa-spinner fa-spin";
+  loginButton.innerHTML = spinner.outerHTML;
+
   let highscore = (await getHighscore(username)) || 0;
 
   fetch(backendUrl + "/login", {
@@ -243,6 +271,9 @@ async function loginUser() {
     })
     .catch((error) => {
       errorElement.textContent = error.message;
+    })
+    .finally(() => {
+      loginButton.innerHTML = "Login";
     });
 }
 
@@ -302,4 +333,12 @@ function showRegisterForm() {
 
   document.querySelector("button[onclick='showRegisterForm()']").classList.add("active-button");
   document.querySelector("button[onclick='showLoginForm()']").classList.remove("active-button");
+}
+
+function openContactDialog() {
+  document.getElementById("contactDialog").showModal();
+}
+
+function openImpressumDialog() {
+  document.getElementById("impressumDialog").showModal();
 }

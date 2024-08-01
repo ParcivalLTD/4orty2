@@ -13,7 +13,6 @@ const username = process.env.MONGODB_USERNAME;
 const password = process.env.MONGODB_PASSWORD;
 const uri = `mongodb+srv://${username}:${password}@cluster0.yzppio2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -24,7 +23,7 @@ const client = new MongoClient(uri, {
 
 const app = express();
 app.use(bodyParser.json());
-app.use(cors()); // Fügen Sie diese Zeile hinzu, um CORS zu aktivieren
+app.use(cors());
 
 app.post("/savehighscores", async (req, res) => {
   const { username, highscore } = req.body;
@@ -107,7 +106,6 @@ app.post("/check-username", async (req, res) => {
       res.json({ exists: false });
     }
   } catch (error) {
-    console.error("Error checking username:", error);
     res.status(500).json({ error: "Error checking username" });
   } finally {
     await client.close();
@@ -115,7 +113,6 @@ app.post("/check-username", async (req, res) => {
 });
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
-  console.log("Received login request:", { username, password });
 
   if (!username || !password) {
     return res.status(400).json({ error: "Username and password are required" });
