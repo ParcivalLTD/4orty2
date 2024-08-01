@@ -195,31 +195,72 @@ async function registerUser() {
   }
 }
 
-async function loginUser() {
+function loginUser() {
   const username = document.getElementById("loginUsername").value;
   const password = document.getElementById("loginPassword").value;
   const errorElement = document.getElementById("auth-error");
 
+  fetch(backendUrl + "/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ username, password }),
+  })
+    .then((response) => response.json().then((data) => ({ status: response.status, data })))
+    .then(({ status, data }) => {
+      if (status !== 200) {
+        errorElement.textContent = data.error;
+      } else {
+        errorElement.textContent = "";
+        if (data.message == "Login successful") {
+          errorElement.style.color = "green";
+          errorElement.textContent = data.message;
+          localStorage.setItem("username", username);
+          localStorage.setItem("isLoggedIn", true);
+          let highscore = getHighscore(username) || 0;
+          localStorage.setItem("highscore", highscore);
+          const highscoreSpan = document.querySelector(".highscore");
+          highscoreSpan.textContent = highscore;
+
+          console.log(data);
+
+          setUsername(username);
+          document.getElementById("authDialog").close();
+        }
+      }
+    })
+    .catch((error) => {
+      errorElement.textContent = error.message;
+    });
+}
+
+async function getHighscore(username) {
+  if (!username) {
+    console.error("Username is required");
+    return null;
+  }
+
   try {
-    const response = await fetch(`${backendUrl}/login`, {
+    const response = await fetch(`${backendUrl}/gethighscore`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ username }),
     });
 
     if (response.ok) {
       const result = await response.json();
-      errorElement.textContent = "";
-      console.log("Login successful:", result);
-      localStorage.setItem("highscore", result.highscore);
+      return result.highscore;
     } else {
       const error = await response.json();
-      errorElement.textContent = error.error;
+      console.error("Error fetching highscore:", error.error);
+      return null;
     }
   } catch (error) {
-    errorElement.textContent = error.message;
+    console.error("Error fetching highscore:", error);
+    return null;
   }
 }
 

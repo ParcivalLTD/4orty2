@@ -114,7 +114,6 @@ app.post("/login", async (req, res) => {
     await client.connect();
     const database = client.db("game");
     const usersCollection = database.collection("users");
-    const highscoresCollection = database.collection("highscores");
 
     const user = await usersCollection.findOne({ username });
     if (!user) {
@@ -128,15 +127,7 @@ app.post("/login", async (req, res) => {
 
     const token = jwt.sign({ username: user.username }, secretKey, { expiresIn: "1h" });
 
-    const userHighscore = await highscoresCollection.findOne({ username });
-    console.log("Abfrageergebnis für Highscore:", userHighscore);
-
-    const highscore = userHighscore ? userHighscore.highscore : 0;
-    console.log("Ermittelter Highscore:", highscore);
-
-    res.status(200).json({ message: "Login successful", token, highscore });
-
-    res.status(200).json({ message: "Login successful", token, highscore });
+    res.status(200).json({ message: "Login successful", token });
   } catch (error) {
     console.error("Error logging in user:", error);
     res.status(500).json({ error: "Error logging in user" });
