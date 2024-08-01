@@ -13,6 +13,7 @@ const username = process.env.MONGODB_USERNAME;
 const password = process.env.MONGODB_PASSWORD;
 const uri = `mongodb+srv://${username}:${password}@cluster0.yzppio2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
+// Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -23,7 +24,7 @@ const client = new MongoClient(uri, {
 
 const app = express();
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors()); // Fügen Sie diese Zeile hinzu, um CORS zu aktivieren
 
 app.post("/savehighscores", async (req, res) => {
   const { username, highscore } = req.body;
@@ -113,6 +114,7 @@ app.post("/login", async (req, res) => {
     await client.connect();
     const database = client.db("game");
     const usersCollection = database.collection("users");
+    const highscoresCollection = database.collection("highscores");
 
     const user = await usersCollection.findOne({ username });
     if (!user) {
@@ -124,18 +126,15 @@ app.post("/login", async (req, res) => {
       return res.status(400).json({ error: "Invalid username or password" });
     }
 
-    const token = jwt.sign({ username }, secretKey, { expiresIn: "1h" });
+    const token = jwt.sign({ username: user.username }, secretKey, { expiresIn: "1h" });
 
-    const highscoresCollection = database.collection("highscores");
     const userHighscore = await highscoresCollection.findOne({ username });
-    if (userHighscore) {
-      res.status(200).json({ token, username, highscore: userHighscore.highscore });
-    } else {
-      res.status(200).json({ token, username, highscore: 0 });
-    }
+    const highscore = userHighscore ? userHighscore.highscore : 0;
+
+    res.status(200).json({ message: "Login successful", token, highscore });
   } catch (error) {
-    console.error("Error logging in:", error);
-    res.status(500).json({ error: "Error logging in" });
+    console.error("Error logging in user:", error);
+    res.status(500).json({ error: "Error logging in user" });
   } finally {
     await client.close();
   }
