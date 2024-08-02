@@ -122,6 +122,10 @@ body {
   margin-bottom: 10px;
 }
 
+.button-list button {
+  width: 8em;
+}
+
 .buttons {
   margin-top: 20px;
 }
@@ -303,7 +307,7 @@ body.dark-mode input:focus {
 }
 
 .active-button {
-  background-color: #4caf50 !important;
+  background-color: #5e7776 !important;
   color: white !important;
 }
 
@@ -341,4 +345,40 @@ button:hover {
 
 .footer a:last-of-type {
   margin-left: 10px !important;
+}
+
+.slide-out {
+  animation: slideOut 0.2s forwards;
+}
+
+@keyframes slideOut {
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+iframe.hidden {
+  display: none;
+}
+
+#usernameInput {
+  width: 40vw;
+}
+
+#authButton {
+  font-size: 0.65em;
+  padding: 5px 10px;
+  width: 6em;
+}
+
+#authDialogFormBtn {
+  font-size: 1.8em;
+  margin-top: 10px;
+}
+
+.spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 }

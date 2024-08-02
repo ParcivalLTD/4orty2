@@ -1,7 +1,10 @@
 let backendUrl = "https://fourorty2.onrender.com";
 
 function play() {
-  window.location.href = "assets/game.html";
+  document.body.classList.add("slide-out");
+  setTimeout(() => {
+    window.location.href = "assets/game.html";
+  }, 200);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -141,16 +144,14 @@ function showScoreBoard() {
   dialog.showModal();
 }
 
-function exitGame() {
-  if (confirm("Are you sure you want to exit the game?")) {
-    window.close();
-  }
-}
-
 function displayTopUsersInModal() {
   const topUsersContainer = document.querySelector("#top-users-modal-body");
 
-  topUsersContainer.innerHTML = "";
+  const spinner = document.createElement("div");
+  spinner.classList.add("spinner");
+  spinner.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+  topUsersContainer.innerHTML = spinner.outerHTML;
+
   fetchTopUsers()
     .then((users) => {
       const topThreeUsers = users.slice(0, 3);
@@ -161,10 +162,12 @@ function displayTopUsersInModal() {
         topUsersContainer.appendChild(userElement);
       });
     })
+    .then(() => {
+      document.querySelector(".spinner").remove();
+    })
     .catch((error) => {
       console.error("Error fetching top users:", error);
-    })
-    .finally(() => {});
+    });
 }
 function openSettingsDialog() {
   const currentUsername = localStorage.getItem("username");

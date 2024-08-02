@@ -23,20 +23,17 @@
         <span id="title">4orty2</span>
         <ul class="button-list">
           <li>
-            <button onclick="play()"><i class="fas fa-play"></i> play</button>
+            <button onclick="play()"><i class="fas fa-play"></i> Play</button>
           </li>
           <li>
-            <button onclick="openSettingsDialog()"><i class="fas fa-cog"></i> settings</button>
+            <button onclick="openSettingsDialog()"><i class="fas fa-cog"></i> Settings</button>
           </li>
           <li>
-            <button onclick="showScoreBoard()"><i class="fas fa-list"></i> scoreboard</button>
+            <button onclick="showScoreBoard()"><i class="fas fa-list"></i> Scores</button>
           </li>
           
           <li>
-            <button id="logout" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> logout</button>
-          </li>
-          <li>
-            <button onclick="exitGame()"><i class="fa-solid fa-xmark"></i> exit</button>
+            <button id="logout" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</button>
           </li>
         </ul>
         <div id="top-users"></div>
@@ -70,8 +67,12 @@
       <dialog id="authDialog">
         <h2><i class="fas fa-lock"></i> Authentication</h2>
         <br>
-        <button type="button" onclick="showLoginForm()">Login</button>
-        <button type="button" onclick="showRegisterForm()">Register</button>
+        <button type="button" id="authButton" onclick="showLoginForm()">
+          <i id="authDialogFormBtn" class="fas fa-sign-in-alt"></i> <br> Login
+        </button>
+        <button type="button" id="authButton" onclick="showRegisterForm()">
+          <i id="authDialogFormBtn" class="fas fa-user-plus"></i> <br> Register
+        </button>
         <br /><br />
         
         <form id="loginForm" method="dialog" onsubmit="loginUser(); return false;" style="display: none;">
@@ -92,8 +93,8 @@
       </dialog>
 
       <div class="footer">
-        <a href="#" id="footerLink" onclick="openContactDialog()">contact</a>
-        <a href="#" id="footerLink" onclick="openImpressumDialog()">imprint</a>
+        <a href="#" id="footerLink" onclick="openContactDialog()">Contact</a>
+        <a href="#" id="footerLink" onclick="openImpressumDialog()">Imprint</a>
       </div>
       
       <dialog id="contactDialog">
@@ -117,6 +118,8 @@
           <button>Close</button>
         </form>
       </dialog>
+
+      <iframe src="assets/game.html" class="hidden"></iframe>
 
       <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
       <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>

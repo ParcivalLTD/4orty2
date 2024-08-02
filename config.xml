@@ -9,4 +9,14 @@
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
     <icon src="res/icon-512.png" />
+
+    <preference name="SplashScreen" value="screen" />
+    <preference name="SplashScreenDelay" value="1000" />
+    <preference name="FadeSplashScreen" value="true" />
+    <preference name="FadeSplashScreenDuration" value="500" />
+    <preference name="ShowSplashScreenSpinner" value="false" />
+    <preference name="AndroidWindowSplashScreenAnimatedIcon" value="res/screen/android/splash-port-hdpi.png" />
+    <preference name="AndroidWindowSplashScreenAnimatedIcon" value="res/screen/android/splash-port-ldpi.png" />
+    <preference name="AndroidWindowSplashScreenAnimatedIcon" value="res/screen/android/splash-port-mdpi.png" />
+    <preference name="AndroidWindowSplashScreenAnimatedIcon" value="res/screen/android/splash-port-xhdpi.png" />
 </widget>
