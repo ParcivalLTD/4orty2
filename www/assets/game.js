@@ -311,6 +311,10 @@ function checkForGameOver() {
   }
 }
 
+function back() {
+  window.location.href = "../index.html";
+}
+
 async function saveHighscore(username, highscore) {
   const url = backendUrl + "/savehighscores";
   const data = { username: username, highscore: highscore };
